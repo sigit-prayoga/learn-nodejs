@@ -1,0 +1,53 @@
+<html>
+
+<head>
+    <title>To Do</title>
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+</head>
+
+<body>
+    <h2>Welcome to my to do app</h2>
+    <input id="todo-input" type="text" placeholder="What up?">
+    <button id="todo-button" onclick="addTodo()">Add Todo</button>
+
+    <ul id="todo-list"></ul>
+
+    <script>
+        $(document).ready(function () {
+            getTodos();
+        });
+        function addTodo() {
+            var body = {};
+            body.todo = $('#todo-input').val();
+            if (body.todo.length == 0) {
+                alert('Type something please!');
+                // stop
+                return;
+            }
+
+            $.post('http://localhost:8787/todos', body, function (data, text, jqr) {
+                if (jqr.status == 200) {
+                    // if success, refresh list
+                    getTodos();
+
+                    // clear input
+                    $('#todo-input').val('');
+                } else {
+                    alert('Something wrong with your request!');
+                }
+            });
+        }
+
+        function getTodos() {
+            $.getJSON('http://localhost:8787/todos', function (data, text, jqr) {
+                var el = '';
+                data.forEach(function (obj) {
+                    el += '<li>' + obj.todo + ' status: ' + obj.done + ' id: ' + obj.id + '</li>'
+                }, this);
+                $('#todo-list').html(el);
+            });
+        }
+    </script>
+</body>
+
+</html>
